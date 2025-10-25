@@ -12,4 +12,16 @@ async def lifespan(app: FastAPI):
     await engine.dispose()
 
 
-app = FastAPI(title="My Blog API", lifespan=lifespan)
+app = FastAPI(
+    title="API",
+    description="Backend API for a technical blog platform.",
+    lifespan=lifespan,
+)
+
+
+@app.get("/", tags=["Root"])
+async def root():
+    """
+    Root API endpoint
+    """
+    return {"message": "My Blog API!"}
