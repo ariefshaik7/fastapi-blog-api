@@ -93,7 +93,7 @@ async def delete_existing_post(
     """
     Deleting a Post by its ID
     """
-    db_post = await post_crud.delete_post(id=id, db=db)
+    db_post = await post_crud.get_post(id=id, db=db)
 
     if db_post is None:
         raise HTTPException(
