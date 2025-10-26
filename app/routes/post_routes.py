@@ -65,7 +65,7 @@ async def update_existing_post(
     """
     Update a post by its ID
     """
-    db_post = await post_crud.update_post(id=id, post=post, db=db)
+    db_post = await post_crud.get_post(id=id, db=db)
 
     if db_post is None:
         raise HTTPException(

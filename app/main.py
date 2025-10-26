@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.routes import post_routes, user_routes
+from app.routes import post_routes, user_routes, auth_routes
 
 
 @asynccontextmanager
@@ -15,6 +15,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(auth_routes.router, tags=["Authentication"])
 app.include_router(post_routes.router, prefix="/posts", tags=["Posts"])
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 

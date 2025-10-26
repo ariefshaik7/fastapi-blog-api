@@ -5,14 +5,14 @@ from sqlalchemy import select
 
 from app.db.session import get_db
 from app.models import models
-from app.schemas import schemas
-from app.utils import verify
+from app.schemas import token_schema
+from app.auth.security import verify_password
 from app.auth import auth
 
 router = APIRouter(tags=["Authentication"])
 
 
-@router.post("/login", response_model=schemas.Token)
+@router.post("/login", response_model=token_schema.Token)
 async def login(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db),
@@ -27,7 +27,7 @@ async def login(
             detail="Invalid credentials",
         )
 
-    if not verify(user_credentials.password, user.password):
+    if not verify_password(user_credentials.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",

@@ -25,7 +25,7 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
 
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM
     )
 
     return encoded_jwt
@@ -39,7 +39,7 @@ def verify_access_token(token: str, credentials_exception):
 
     try:
         payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
 
         user_id: str = payload.get("sub")
@@ -54,7 +54,7 @@ def verify_access_token(token: str, credentials_exception):
     return token_data
 
 
-def get_current_user(
+async def get_current_user(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
 ):
     """
@@ -68,8 +68,13 @@ def get_current_user(
     )
 
     token_data = verify_access_token(token, credentials_exception)
-
-    query = select(User).where(User.id == token_data.id)
+    
+    try:
+        user_id_int = int(token_data.id)
+    except (ValueError, TypeError):
+        raise credentials_exception
+    
+    query = select(User).where(User.id == user_id_int)
 
     user = await db.scalar(query)
 

@@ -22,6 +22,7 @@ async def create_user(user: user_schema.UserCreate, db: AsyncSession) -> User:
 
     new_user_data = user.model_dump()
     new_user_data["password"] = hashed_pass
+    new_user_data["is_active"] = True
 
     new_user = User(**new_user_data)
 
