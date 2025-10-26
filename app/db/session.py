@@ -11,10 +11,10 @@ AsyncSessionFactory = async_sessionmaker(
 )
 
 
-# Declarative base for all models 
+# Declarative base for all models
 class Base(DeclarativeBase):
     pass
-    
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
@@ -29,4 +29,3 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
-        

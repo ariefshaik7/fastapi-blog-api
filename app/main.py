@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.db.session import engine
 from app.models.models import Base
+from app.routes import post_routes
 
 
 @asynccontextmanager
@@ -17,6 +18,8 @@ app = FastAPI(
     description="Backend API for a technical blog platform.",
     lifespan=lifespan,
 )
+
+app.include_router(post_routes.router, prefix="/posts", tags=["Posts"])
 
 
 @app.get("/", tags=["Root"])
