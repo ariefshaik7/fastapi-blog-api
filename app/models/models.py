@@ -21,7 +21,7 @@ class User(Base):
     )
 
     posts: Mapped[list["Post"]] = relationship(
-        "Posts", back_populates="owner", cascade="all, delete-orphan"
+        "Post", back_populates="owner", cascade="all, delete-orphan"
     )
 
     # Dunder Method / Magic Method

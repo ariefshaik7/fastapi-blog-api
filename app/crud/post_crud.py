@@ -24,11 +24,13 @@ async def get_post(id: int, db: AsyncSession) -> Post | None:
     return await db.get(Post, id)
 
 
-async def create_post(post: post_schema.PostCreate, db: AsyncSession) -> Post:
+async def create_post(
+    post: post_schema.PostCreate, db: AsyncSession, owner_id: int
+) -> Post:
     """
     Creating a new Post
     """
-    new_post = Post(title=post.title, content=post.content)
+    new_post = Post(title=post.title, content=post.content, owner_id=owner_id)
 
     db.add(new_post)
     await db.commit()

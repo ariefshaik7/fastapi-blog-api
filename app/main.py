@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.models.models import Base
-from app.routes import post_routes
+from app.db.session import Base
+from app.routes import post_routes, user_routes
 
 
 @asynccontextmanager
@@ -17,6 +17,7 @@ app = FastAPI(
 )
 
 app.include_router(post_routes.router, prefix="/posts", tags=["Posts"])
+app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 
 
 @app.get("/", tags=["Root"])
