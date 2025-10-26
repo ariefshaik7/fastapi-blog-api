@@ -10,6 +10,7 @@ from app.crud import post_crud
 from app.models.models import User
 from app.auth.auth import get_current_user
 
+
 router = APIRouter()
 
 
@@ -47,12 +48,19 @@ async def create_new_post(
     """
     Create a new Post
     """
-    return await post_crud.create_post(post=new_post, db=db)
+    return await post_crud.create_post(
+        post=new_post,
+        db=db,
+        owner_id=current_user.id,
+    )
 
 
 @router.put("/{id}", response_model=post_schema.Post)
 async def update_existing_post(
-    id: int, post: post_schema.PostUpdate, db: AsyncSession = Depends(get_db)
+    id: int,
+    post: post_schema.PostUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Update a post by its ID
@@ -65,11 +73,23 @@ async def update_existing_post(
             detail=f"post with {id} does not exist",
         )
 
-    return db_post
+    if db_post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to update this post",
+        )
+
+    updated_post = await post_crud.update_post(id=id, post=post, db=db)
+
+    return updated_post
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_existing_post(id: int, db: AsyncSession = Depends(get_db)):
+async def delete_existing_post(
+    id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """
     Deleting a Post by its ID
     """
@@ -81,4 +101,12 @@ async def delete_existing_post(id: int, db: AsyncSession = Depends(get_db)):
             detail=f"Post with {id} does not exist",
         )
 
-    return db_post
+    if db_post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to delete this post",
+        )
+
+    await post_crud.delete_post(id=id, db=db)
+
+    return None

@@ -6,10 +6,11 @@ class UserBase(BaseModel):
     email: str
     
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=8, max_length=72)
+    password: str 
     
 class User(BaseModel):
     id: int
+    email: EmailStr
     is_active: bool
     created_at: datetime
     

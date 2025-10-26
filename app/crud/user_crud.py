@@ -1,8 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.models.models import User
 from app.schemas import user_schema
-from app.auth import security
-from sqlalchemy.future import select
+from app.auth.security import hash_password
+
 
 async def get_user_by_email(email: str, db: AsyncSession) -> User | None:
     """
@@ -15,15 +16,16 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User | None:
 
 async def create_user(user: user_schema.UserCreate, db: AsyncSession) -> User:
     """
-    create a new user
+    Create a new user
     """
-    hashed_pass = security.hash_password(user.password)
+    hashed_pass = hash_password(user.password)
 
-    user.password = hashed_pass
+    new_user_data = user.model_dump()
+    new_user_data["password"] = hashed_pass
 
-    new_user = User(**user.model_dump())
+    new_user = User(**new_user_data)
 
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    await db.commit()
+    await db.refresh(new_user)
     return new_user

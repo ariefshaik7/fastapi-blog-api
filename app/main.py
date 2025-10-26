@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.db.session import Base
 from app.routes import post_routes, user_routes
 
 
